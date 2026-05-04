@@ -16,6 +16,11 @@ style: |
     .col-35 {
         flex: 0 0 35%;
     }
+    .bottom-right {
+        position: absolute;
+        bottom: 80px;
+        right: 80px;
+    }
 ---
 
 # JSON - freedom or chaos
@@ -53,6 +58,13 @@ easy to use, API friendly... It was going to be beautiful..."
 - Last year I presented "Repos are like children - Parenting 101"
 - Lives by the phrase: *There must be a better way*
 - https://linkedin.com/in/bartdorlandt/
+- https://dreamnetworking.nl/
+
+<div class="bottom-right">
+
+![w:200px](images/qr_bart_linkedin.png)
+
+</div>
 
 <!-- I'll be talking you on a journey of chaos and struggle towards a better future, a trusted future -->
 ---
@@ -63,18 +75,16 @@ easy to use, API friendly... It was going to be beautiful..."
 
 - Fear of losing flexibility and freedom to change things quickly
 - The jsons are in use, teams and tools depend on them
-- Even having the same output generated wasn't enough
+- Even having the same output generated wasn't enough...
 
 ---
 
 ## The agreement
 
-> Validation is a good thing!
-
 - We had some validation in place
 - We had very limited data field validation
 - Mostly written on issue, "after the fact", when something was broken
-- **No argument against improving validation**
+- **No argument against improving validation!!**
 
 ![bg right:30%](images/party.png)
 
@@ -221,6 +231,15 @@ class Server(BaseModel):
     type_id: PositiveInt = Field(alias="type-id")
     bs_flag: bool | None = None
 ```
+
+---
+## Pydantic useful types
+
+- PositiveInt
+- `pydantic-extra-types[pycountry]`
+  - CountryAlpha2
+  - Latitude, Longitude
+  - MacAddress
 
 ---
 
@@ -387,15 +406,19 @@ for d, d_data in json_.items():
   - Different data objects within
 - Treat it as a giant black box will give you hell
 
+<!-- Make things as easy as possible for the consumer/user -->
+
 ---
 
 ## Gotchas of generating the data from the model
 
-- Use `model_dump` with `by_alias=True` to ensure the output matches the original field names
+- Use `model_dump` with `by_alias=True` to ensure the output matches the original field names (`Field(alias=...)` in the model)
+- Same for `exclude_unset=True` to avoid dumping fields that were not set in the original data
 - Errors:
   - Who is the audience?
   - Gather errors and present them as a whole!
 
+<!-- When thinking of errors, who are they for? Ensure people can work with them without you! -->
 ---
 
 ## Second part done
@@ -409,6 +432,10 @@ for d, d_data in json_.items():
   - Are there fields that are optional but always populated?
   - Are there fields that are optional but never populated?
 
+<!--
+- Are there fields that are optional but always populated?
+- Are there fields that are optional but never populated?
+-->
 ---
 
 ## Side bonus
@@ -423,6 +450,15 @@ schema.write_text(json.dumps(m, indent=2))
 
 And load it in VScode
 
+---
+
+## Model Hygiene - validation our own model
+
+![drop-shadow](images/model_validation.png)
+
+<!-- This step is specifically useful to keep the model accurate and up-to-date over time.
+Else, I'm quite positive fields would not be removed if it was the last entry.
+Or things are marked optional instead of mandatory. -->
 ---
 
 ## Model Hygiene
@@ -469,7 +505,7 @@ def test_main_model_obsolete_fields(json_, model_class, m_type):
 
 ---
 
-## Pytest to go beyond
+## Pytest to go beyond pydantic
 
 - As seen, pydantic is great for validating individual fields and their types
   - But what about conditional dependencies?
@@ -478,6 +514,7 @@ def test_main_model_obsolete_fields(json_, model_class, m_type):
   - Or validating uniqueness throughout the entire dataset?
 - Pytest allows us to write custom tests that can check for these more complex rules
 
+<!-- Pydantic can't do uniqueness verification or isn't the tool for conditional dependencies. Especially on multiple levels -->
 ---
 
 ## Uniqueness validation example
@@ -493,7 +530,7 @@ def test_duplicate_hostnames(json_: dict):
 ```
 ---
 
-## Using a fixture for reusable subsets
+## Using fixtures for reusable subsets
 
 ```python
 @pytest.fixture(scope="session")
@@ -529,8 +566,10 @@ def json_fixture(request: pytest.FixtureRequest) -> dict[str, dict]:
         A dictionary mapping of the json for each environment.
     """
     return instances_mapper.load_instances_pop_types(request.param)
-
 ```
+<!-- When dealing with multiple environments, this approach works great.
+Same logic and tests are applied consistently across all environments.
+ -->
 ---
 
 ## Pytest focus areas
@@ -554,6 +593,8 @@ def json_fixture(request: pytest.FixtureRequest) -> dict[str, dict]:
 
 - Let's have a look at the challenges that come with this
 
+![bg right](images/challenges.png)
+
 ---
 
 ## The 10-Year Data Problem
@@ -568,6 +609,7 @@ Sounds simple. It's not.
 
 **The scary part of freedom data: you can't be certain.**
 
+<!-- Even when there was inconsistent values for a field, it was difficult to have it removed or changed -->
 ---
 
 ## The Cross-Team Challenge
@@ -581,30 +623,33 @@ Not everyone works the same way:
 | CI/CD native  | Manual deploy      |
 | Rebase expert | Rebase hell        |
 
-> Both are modifying the same JSON files, but they have very different workflows and comfort levels with change.
+<!-- Both are modifying the same JSON files, but they have very different workflows and comfort levels with change.
+Ensure it is easily consumable for all teams. -->
 
 ---
-
-## Slide 22: Lessons Learned
-<!--
+## Lessons Learned
 **Technical:**
-- Pydantic v2 handles the messy real-world types (BoolStr, PortName, IntStr)
+- Pydantic handles the messy real-world types very well
+- Having the model hygiene is more important than initially expected
 - The 3-way validation triangle keeps models honest
-- `conftest.py` session-scoped fixtures = parse once, test many times
-- Auto-generation eliminates entire categories of bugs
-
-**Human:**
-- Ensure everyone is heard before making changes
-- Bite-sized pieces build trust incrementally
-- The "fail fast" philosophy is easier to sell than "let's redesign everything"
-- Git conflicts disappearing is a **surprisingly strong argument** -->
 
 ---
-## Pydantic useful types
+## Lessons Learned
+**Human:**
+- Changing fields/data is harder than building the pydantic model!
+- People had to get used that their merge requests couldn't be merged.
+-
 
-- PositiveInt
-- CountryAlpha2
-- Latitude, Longitude
+---
+
+## Summary
+
+| Before                         | After                         |
+| ------------------------------ | ----------------------------- |
+| "Is this valid JSON?"          | Type-safe, validated on parse |
+| "What does this field accept?" | Self-documenting model        |
+| Bugs found in production       | Bugs caught in CI             |
+| "Is this field still used?"    | Test tells you immediately    |
 
 ---
 
@@ -617,28 +662,15 @@ Look at your own "freedom data." Ask yourself:
 3. **Who else uses it?** Do you actually know?
 4. **What's the smallest step?** One Pydantic model. One test. One field.
 
-> You don't have to eat the whole elephant today.
-> Just take the first bite.
-
+<!-- Challenge the audience to have a look inside -->
 ---
 
-## Slide 25: Summary
-
-| Before                         | After                         |
-| ------------------------------ | ----------------------------- |
-| "Is this valid JSON?"          | Type-safe, validated on parse |
-| "What does this field accept?" | Self-documenting model        |
-| Bugs found in production       | Bugs caught in CI             |
-| "Is this field still used?"    | Test tells you immediately    |
-
----
 ## Gotchas
 
 - IPv6 notation
 - Avoid redundant fields, because it "could" be nice
-- Data governance is challenging ?
 - Proving that a field could never be used, doesn't mean other teams believe it.
-- Data governance - who owns the data and who uses it?
+- Data governance is challenging - who owns the data and who uses it?
 - The people who understand it best, might show the most resistance
 
 ---
@@ -655,41 +687,3 @@ Look at your own "freedom data." Ask yourself:
 
 - Bart Dorlandt
 - https://linkedin.com/in/bartdorlandt/
-
-<!--
-## Slide 16: The 3-Way Validation Triangle
-
-```
-        ┌─────────────────────────────────┐
-        │           YOUR DATA             │
-        │    (instances.json, pipes.json) │
-        └───────────────┬─────────────────┘
-                        │
-           1. Does data match model?
-           2. Does model match data?
-           3. Is the model still tight?
-                        │
-        ┌───────────────▼─────────────────┐
-        │           YOUR MODEL            │
-        │         (Pydantic + pytest)     │
-        └─────────────────────────────────┘
-```
-
-1. **Data → Model**: Pydantic validation on parse
-2. **Model → Data**: pytest checks optional/required accuracy
-3. **Model tightness**: pytest checks for obsolete/unused fields
-
----
-
----
-
-## Step 1: Information gathering
-
-- Accept the tedious bit going through the data manually, field by field...
-- Where is the fun in that?
-- Let's get a feeling of it all, write some code to show all field types
-- Mark fields as required vs optional
-- Split into multiple main categories
-  - Align fields per category
-
--->
