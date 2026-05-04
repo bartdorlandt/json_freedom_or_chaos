@@ -24,4 +24,6 @@ The talk also covers the human side: resistance to change, cross-team challenges
 ## Presented by
 
 Bart Dorlandt — Freelance Network Automation Solution Architect
-https://linkedin.com/in/bartdorlandt/
+
+- https://linkedin.com/in/bartdorlandt/
+- https://dreamnetworking.nl/
