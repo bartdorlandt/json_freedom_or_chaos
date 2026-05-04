@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+vars:
+  FILE: json_freedom_or_chaos
+  METADATA: "--title 'JSON: Freedom or Chaos?' --author 'Bart Dorlandt' --keywords
+    'json, validation, chaos, freedom' --description 'A presentation about the
+    challenges of working with JSON data and the importance of validation.'"
+
+tasks:
+  default: task -l --sort none
+
+  export:
+    desc: Export the presentation to PDF
+    vars:
+      EXPORT_FILE: export/{{.FILE}}.pdf
+      EXPORT_NOTES_FILE: export/{{.FILE}}_notes.pdf
+      OPTIONS: --allow-local-files --pdf {{.METADATA}}
+    cmds:
+      - marp {{.OPTIONS}} -o {{.EXPORT_FILE}} {{.FILE}}.md
+      - marp {{.OPTIONS}} --pdf-notes -o {{.EXPORT_NOTES_FILE}} {{.FILE}}.md
