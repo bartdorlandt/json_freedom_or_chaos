@@ -331,7 +331,9 @@ Informative scripts were used to understand the fields and optionality
   - Start strict
 
 <!--
-Start strict allows you to see the errors. If everything is permissive you can't find the "challenges" or errors --- -->
+Start strict allows you to see the errors. If everything is permissive you can't find the "challenges" or errors-->
+
+---
 
 ## Dealing with discrepancies
 
