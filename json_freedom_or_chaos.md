@@ -4,7 +4,7 @@ theme: gaia
 _class: lead
 paginate: true
 backgroundColor: #fff
-backgroundImage: url('images/dream_bg.png')
+backgroundImage: url('template/dream_bg.png')
 style: |
     .container {
         display: flex;
@@ -20,6 +20,11 @@ style: |
         position: absolute;
         bottom: 80px;
         right: 80px;
+    }
+    .logo-position {
+        position: absolute;
+        top: 13px;
+        right: 68px;
     }
     blockquote::before,
     blockquote::after {
@@ -51,11 +56,19 @@ using pydantic and pytest
 
 - No more "what does this field actually accept?"
 - One source of records with trustworthy data.
-- Data generated where needed, not manually crafted or copied.
+- Data generated instead of manually crafted or copied.
 
 *It is going to be beautiful.*
 
+<!-- Given the situation around the json
+ -->
+
 ---
+<div class="logo-position">
+
+![w:450px](template/dream_logo.png)
+
+</div>
 
 ## Bart Dorlandt
 
@@ -63,12 +76,10 @@ using pydantic and pytest
 - 20 years in network engineering and automation
 - Last year I presented "Repos are like children - Parenting 101"
 - Lives by the phrase: *There must be a better way*
-- https://linkedin.com/in/bartdorlandt/
-- https://dreamnetworking.nl/
 
 <div class="bottom-right">
 
-![w:220px](images/qr_bart_linkedin.png)
+![w:180px](template/qr_bart_linkedin.png)
 
 </div>
 
@@ -83,17 +94,22 @@ using pydantic and pytest
 - The jsons are in use, teams and tools depend on them
 - Even having the same output generated wasn't enough...
 
+<!-- Maybe the change was too big, maybe the timing was off or maybe not correctly presented
+Bottom line was that the change was too big and/or undesired -->
+
 ---
 
 ## The agreement
 
-- We had some validation in place
-- We had very limited data field validation
+- Some validation in place
+- Very limited data field validation
 - Mostly written on issue, "after the fact", when something was broken
 - **No argument against improving validation!!**
 
 ![bg right:30%](images/party.png)
 
+<!-- an old and incomplete validation environment was in place
+We all agreed that validation improvement is a good thing -->
 ---
 
 <!-- _class: lead -->
@@ -117,6 +133,11 @@ using pydantic and pytest
 
 Let's try to stick to the technical story
 
+<!--
+data sets were added via mako templates by line manipulation (existing tools)
+Limiting the options of using it programmatically
+This crosses multiple teams and tools and therefore a bunch of unknown unknowns
+ -->
 ---
 
 ## The Freedom Trap
@@ -128,8 +149,10 @@ Let's try to stick to the technical story
   - Multi team challenges
     - Not everyone has the same skill set
 
-<!-- Changes are hard within the team, outside the team almost impossible
-data governance is probably doesn't exist
+<!-- * Changes are hard within the team, outside the team almost impossible
+* data governance probably doesn't exist
+* Not everyone knows git or is comfortable enough to go through rebases
+* So, is this worth freedom? Or just the thought of freedom?
 -->
 ---
 
@@ -140,7 +163,7 @@ data governance is probably doesn't exist
 - Validate the fields and the logic through tests
 - Ensure having it future proof, and maintainable in the long run
 
-> pydantic and pytest are our buddies (in this journey)
+> pydantic and pytest are our buddies (not only in this journey)
 
 <!-- Anything we do should not impact what we have today. -->
 ---
@@ -148,7 +171,7 @@ data governance is probably doesn't exist
 ## Meet "Freedom Data"
 
 ```json
-{
+[
     "one_of_many_containers": {
         "type": "TYPE2",
         "active": "true",
@@ -167,24 +190,30 @@ data governance is probably doesn't exist
         "legacy_thing": true,
         "old_generation": "true"
     }
-}
+]
 ```
 
 > "It works, don't touch it."
 
 <!-- For those familiar with json, immediately recognize the layout is a bit off.
 multiple attributes on the same line.
-boolean values as actual bool , yet also as string -->
+boolean as bool, yet also as string -->
 ---
 
 ## What is Pydantic?
 
-*It's a Python library for data validation and settings management using Python type annotations. It allows you to define data models with type hints, and it will automatically validate and parse data according to those models.*
+*It's a Python library for data validation and settings management using Python type annotations.
+It allows you to define data models with type hints, and it will automatically validate and parse data according to those models.*
+
+<!-- I had mentioned pydantic,
+I came to know about it through FastAPI, where it is also mainly used for input validation
+
+Where annotations are used for the human at , pydantic does the work at runtime.
+-->
 
 ---
 
 ## Pydantic example
-
 
 <div class="container">
 <div class="col">
@@ -217,7 +246,7 @@ u = User(**user)
 print(u)
 >>> name='Bart Dorlandt' age=25 location='The Netherlands'
 ```
-
+<!-- Some wishful thinking here -->
 ---
 ## A little deeper
 
@@ -235,7 +264,7 @@ class Server(BaseModel):
     type_id: PositiveInt = Field(alias="type-id")
     bs_flag: bool | None = None
 ```
-
+<!-- ports have a smart Union, where either of the defined models may match -->
 ---
 ## Pydantic useful types
 
@@ -282,6 +311,9 @@ class Connection(BaseModel):
 </div>
 </div>
 
+<!-- The descriptions can be useful for later, but also allow for additional information when generating a json schema.
+ -->
+
 ---
 ## Down the rabbit hole
 
@@ -299,8 +331,8 @@ def port_name_validator(value: str) -> str:
 PortName = Annotated[str, AfterValidator(port_name_validator)]
 
 class PortLayout1(BaseModel):
-    srv_type1: list[PortName] = Field(None)
-    srv_type2: list[PortName] = Field(None)
+    srv_type1: list[PortName] | None = None
+    srv_type2: list[PortName] | None = None
 
     @model_validator(mode="after")
     def validate_one_srv_type(self):
@@ -313,7 +345,9 @@ class PortLayout1(BaseModel):
 
         return self
 ```
-
+<!-- Things can become more complex where complexity is required. Allowing you to be very specific
+I do love me some good regex.
+-->
 ---
 
 ## Understanding the data
@@ -327,18 +361,29 @@ Informative scripts were used to understand the fields and optionality
 
 > Making things smaller creates more celebration moments :)
 
+<!--
+* With some scripts I was able to get a feeling of the different fields and if they could be mandatory
+* Take one dict and parse it, piece by piece.
+* Gain knowledge, gain trust
+ -->
+
 ---
 ## One blob of many done...
 
-- Multiple to go
-- Having one portion done doesn't guarantee success for the rest
+- Having one portion done doesn't guarantee success for the rest.
+  - The freedom is hunting us
 - This is a repetitive process, one fix at a time
-(I assume you know how to eat an elephant?)
 - This is the moment where discrepancies are found
   - Start strict
 
+![bg right:25% h:500px](images/elephant.png)
+
 <!--
-Start strict allows you to see the errors. If everything is permissive you can't find the "challenges" or errors-->
+* Many more blobs to go, all slightly different
+* Start strict allows you to see the errors. If everything is permissive you can't find the "challenges" or errors
+* Remember the description field, it can also be used to make notes for later
+  * Or your jira tickets
+-->
 
 ---
 
@@ -351,7 +396,10 @@ Start strict allows you to see the errors. If everything is permissive you can't
   - Use (smart) unions to define strict variations instead of 1 class with a bunch of optional fields
 - Collect issues/mismatches to deal with the organization later
 
-<!-- - Not everything can be fixed on day 1 -->
+<!--
+- Not everything can be fixed on day 1
+- Save something for tomorrow
+-->
 
 ---
 ## Parsing the data
@@ -369,7 +417,14 @@ for d, d_data in json_.items():
         logger.error(f"\nError processing {d!r}")
         model_helper.validation_error_printer(d, e)
         continue
+...
 ```
+<!--
+Let's explore some code. Kept simple for clarity
+No error is good, as usual
+Dealing with the data on a per `d_type` basis, to keep the error scope small
+
+-->
 ---
 
 ## First part done ![w:100px](images/green_check.png)
@@ -380,6 +435,10 @@ for d, d_data in json_.items():
   - diff the original and generated data to find discrepancies
     - Did we capture all the data/fields?
 
+<!--
+Fast forward, we got the entire model done
+Next, the other direction
+-->
 ---
 
 ## Parse and Dump
@@ -389,8 +448,6 @@ type_mapper: dict[str, BaseModel] = {
     "type3": model_type3.TYPE3,
     "type2": model_type2.TYPE2,
 }
-
-# Dealing with the data on a per `d_type` basis.
 
 for d, d_data in json_.items():
     m: BaseModel = type_mapper[d_type](**d_data)
@@ -402,7 +459,11 @@ for d, d_data in json_.items():
         d_errors[d] = diff
 ```
 
-<!-- This is simplified code for clarity. -->
+<!--
+* This is simplified code for clarity.
+* Dealing with the data on a per `d_type` basis, to keep the error scope small
+* Again, looping over portions to validate and get more precise errors
+-->
 
 ---
 
@@ -413,19 +474,18 @@ for d, d_data in json_.items():
   - Different data objects within
 - Treat it as a giant black box will give you hell
 
-<!-- Make things as easy as possible for the consumer/user -->
-
+<!--
+Make it small
+Make it easy
+Make the errors consumable and specific
+-->
 ---
 
 ## Gotchas of generating the data from the model
 
 - Use `model_dump` with `by_alias=True` to ensure the output matches the original field names (`Field(alias=...)` in the model)
-- Same for `exclude_unset=True` to avoid dumping fields that were not set in the original data
-- Errors:
-  - Who is the audience?
-  - Gather errors and present them as a whole!
+- Same for `exclude_unset=True` to avoid dumping fields that were not filled in the original data
 
-<!-- When thinking of errors, who are they for? Ensure people can work with them without you! -->
 ---
 
 ## Second part done ![w:100px](images/green_check.png)
@@ -435,11 +495,10 @@ for d, d_data in json_.items():
 - Side Bonus: JSON Schema generation from Pydantic models
 - Next step
   - Can we force everybody to care as much as I do?
-  - Model hygiene over time
-  - Are there fields that are optional but always populated?
-  - Are there fields that are optional but never populated?
+  - Forced model hygiene
 
 <!--
+- Use the description field to add notes for the json schema
 - Are there fields that are optional but always populated?
 - Are there fields that are optional but never populated?
 -->
@@ -455,7 +514,7 @@ schema = Path("schema.json")
 schema.write_text(json.dumps(m, indent=2))
 ```
 
-And load it in VScode
+And load it in VScode (settings.json)
 
 ---
 
@@ -464,17 +523,19 @@ And load it in VScode
 ![drop-shadow](images/model_validation.png)
 
 <!-- This step is specifically useful to keep the model accurate and up-to-date over time.
-Else, I'm quite positive fields would not be removed if it was the last entry.
-Or things are marked optional instead of mandatory. -->
+Else, I'm quite positive fields
+* would not be removed if it was the last entry.
+* Or things are marked optional instead of mandatory.
+-->
 ---
 
 ## Model Hygiene
 > "The model tells a story about the data. Make sure it's not fiction."
 
 ```python
-@pytest.mark.parametrize(
-    "model_class,m_type",
-    [ (model_type2.TYPE2, "TYPE2"),
+@pytest.mark.parametrize("model_class,m_type",
+    [
+        (model_type2.TYPE2, "TYPE2"),
         (model_type3.TYPE3, "TYPE3")
     ],
 )
@@ -486,7 +547,9 @@ def test_main_model_obsolete_fields(json_, model_class, m_type):
         "— probably obsolete! Remove and run the test again to confirm!"
     )
 ```
-
+<!--
+Validate obsolete fields in the model and fail the pipeline
+-->
 
 ---
 
@@ -510,18 +573,24 @@ def test_main_model_obsolete_fields(json_, model_class, m_type):
   - Validation beyond single fields
   - Conditional dependencies between fields
 
+<!--
+This is looking good.
+Now let's go beyond the single field validation
+ -->
 ---
 
 ## Pytest to go beyond pydantic
 
 - As seen, pydantic is great for validating individual fields and their types
-  - But what about conditional dependencies?
-    - Either within the same object
-    - Yet, mainly on different levels of the data structure
-  - Or validating uniqueness throughout the entire dataset?
-- Pytest allows us to write custom tests that can check for these more complex rules
+- Pytest helps us to validate more complex rules
+  - conditional dependencies between fields
+  - uniqueness of values across the dataset
 
-<!-- Pydantic can't do uniqueness verification or isn't the tool for conditional dependencies. Especially on multiple levels -->
+<!--
+Pydantic is great for fields.
+It can't do uniqueness verification or isn't the tool for conditional dependencies.
+Especially on multiple levels
+-->
 ---
 
 ## Uniqueness validation example
@@ -555,6 +624,12 @@ def test_ips_g20(flavor20sets: dict[str, dict]) -> None:
     for d, d_data in flavor20sets.items():
         ...
 ```
+<!--
+In the solution I use quite a lot of fixtures
+* to ensure consistency across different test cases
+* to provide reusable subsets of data
+* to keep tests simple
+-->
 ---
 
 ## Using parametrize for multiple data points
@@ -576,14 +651,14 @@ def json_fixture(request: pytest.FixtureRequest) -> dict[str, dict]:
 ```
 <!-- When dealing with multiple environments, this approach works great.
 Same logic and tests are applied consistently across all environments.
- -->
+-->
 ---
 
 ## Pytest focus areas
 
 - Fixtures are key for reusable subsets of data
   - Achieving small and simpler test functions
-- Parametrize is just awesome and key for testing multiple data points
+- Parametrize is just awesome and key for testing multiple data sets
 
 ---
 
@@ -593,6 +668,8 @@ Same logic and tests are applied consistently across all environments.
 - Accomplished the model matching the data
 - Accomplished model hygiene enforcement
 - Accomplished validation beyond single fields and complex dependencies
+
+Don't forget to educate teams
 
 ---
 
@@ -628,35 +705,21 @@ Not everyone works the same way:
 | Loves git     | "What's a branch?" |
 | Python fluent | Uses Excel         |
 | CI/CD native  | Manual deploy      |
-| Rebase expert | Rebase hell        |
+| Rebase expert | Rebase FML         |
 
-<!-- Both are modifying the same JSON files, but they have very different workflows and comfort levels with change.
-Ensure it is easily consumable for all teams. -->
+<!--
+Both are modifying the same JSON files,
+but they have very different workflows and comfort levels with change.
+Ensure it is easily consumable for all teams.
+-->
 
 ---
 ## Lessons Learned
-**Technical:**
 - Pydantic handles the messy real-world types very well
 - Having the model hygiene is more important than initially expected
-- The 3-way validation triangle keeps models honest
-
----
-## Lessons Learned
-**Human:**
+- The 3-way validation triangle keeps the model honest
 - Changing fields/data is harder than building the pydantic model!
-- People had to get used that their merge requests couldn't be merged.
-
-
----
-
-## Summary
-
-| Before                         | After                         |
-| ------------------------------ | ----------------------------- |
-| "Is this valid JSON?"          | Type-safe, validated on parse |
-| "What does this field accept?" | Self-documenting model        |
-| Bugs found in production       | Bugs caught in CI             |
-| "Is this field still used?"    | Test tells you immediately    |
+- Proving that a field could never be used, doesn't mean others believe it
 
 ---
 
@@ -670,24 +733,7 @@ Look at your own "freedom data." Ask yourself:
 4. **What's the smallest step?** One Pydantic model. One test. One field.
 
 <!-- Challenge the audience to have a look inside -->
----
 
-## Gotchas
-
-- IPv6 notation
-- Avoid redundant fields, because it "could" be nice
-- Proving that a field could never be used, doesn't mean other teams believe it.
-- Data governance is challenging - who owns the data and who uses it?
-- The people who understand it best, might show the most resistance
-
----
-## Show results
-
-- Showing the impact needs to be done
-- Spend some time on creating a report
-(Isn't that one of AI's use cases?)
-<!-- I had a report created allowing to show that a third of the pipelines failed. That is a third of issues not hitting production
- -->
 ---
 
 ## Q&A
@@ -696,3 +742,11 @@ Look at your own "freedom data." Ask yourself:
 
 - Bart Dorlandt
 - https://linkedin.com/in/bartdorlandt/
+- https://dreamnetworking.nl/
+- https://github.com/bartdorlandt/
+
+<div class="bottom-right">
+
+![w:220px](template/qr_bart_linkedin.png)
+
+</div>
