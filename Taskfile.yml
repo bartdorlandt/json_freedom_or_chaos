@@ -4,6 +4,7 @@ version: "3"
 
 vars:
   FILE: json_freedom_or_chaos
+  MAIN_OPTIONS: "--allow-local-files"
   METADATA: "--title 'JSON: Freedom or Chaos?' --author 'Bart Dorlandt' --keywords
     'json, validation, chaos, freedom' --description 'A presentation about the
     challenges of working with JSON data and the importance of validation.'"
@@ -11,12 +12,44 @@ vars:
 tasks:
   default: task -l --sort none
 
-  export:
+  mkdir:export:
+    desc: Create export directory if it doesn't exist
+    internal: true
+    status:
+      - test -d export
+    cmds:
+      - mkdir -p export
+
+  export:pdf:
     desc: Export the presentation to PDF
+    deps: [ mkdir:export ]
     vars:
       EXPORT_FILE: export/{{.FILE}}.pdf
       EXPORT_NOTES_FILE: export/{{.FILE}}_notes.pdf
-      OPTIONS: --allow-local-files --pdf {{.METADATA}}
+      OPTIONS: "{{.MAIN_OPTIONS}} --pdf {{.METADATA}}"
     cmds:
       - marp {{.OPTIONS}} -o {{.EXPORT_FILE}} {{.FILE}}.md
       - marp {{.OPTIONS}} --pdf-notes -o {{.EXPORT_NOTES_FILE}} {{.FILE}}.md
+
+  export:pptx:
+    desc: Export the presentation to PPTX
+    deps: [ mkdir:export ]
+    vars:
+      EXPORT_FILE: export/{{.FILE}}.pptx
+      OPTIONS: "{{.MAIN_OPTIONS}} --pptx {{.METADATA}}"
+    cmds:
+      - marp {{.OPTIONS}} -o {{.EXPORT_FILE}} {{.FILE}}.md
+
+  present:
+    desc: Present the presentation
+    vars:
+      OPTIONS: "{{.MAIN_OPTIONS}}"
+    cmds:
+      - open http://localhost:8080/{{.FILE}}.md
+      - marp -s {{.OPTIONS}} .
+
+  notes:
+    desc: Export the notes
+    cmds:
+      - marp --notes {{.FILE}}.md
+      - mv json_freedom_or_chaos.txt export/

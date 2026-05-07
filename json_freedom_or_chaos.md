@@ -40,12 +40,11 @@ using pydantic and pytest
 
 ## I had a Dream 💭
 
-> "A proper system, a source of records, modelled, validated,
-easy to use, API friendly... It was going to be beautiful..."
+> A proper system, a source of records, modelled, validated, easy to use, API friendly...
 
 - No more "what does this field actually accept?"
 - One source of records with trustworthy data.
-- Data generated where needed, not manually crafted.
+- Data generated where needed, not manually crafted or copied.
 
 *It is going to be beautiful.*
 
@@ -62,7 +61,7 @@ easy to use, API friendly... It was going to be beautiful..."
 
 <div class="bottom-right">
 
-![w:200px](images/qr_bart_linkedin.png)
+![w:220px](images/qr_bart_linkedin.png)
 
 </div>
 
@@ -102,7 +101,7 @@ easy to use, API friendly... It was going to be beautiful..."
 
 ## The situation
 
-- massive JSON files describing a multitude of sets of data
+- Massive JSON files describing a multitude of sets of data
 - Manually crafted (via Mako templates)
   - Some dicts crafted on a single lines, others vertically aligned
 - **12,000 lines** in "short" format — **72,000 lines** in long format
@@ -143,8 +142,8 @@ data governance is probably doesn't exist
 
 ```json
 {
-    "One_of_many_containers": {
-        "type": "MODEL1",
+    "one_of_many_containers": {
+        "type": "TYPE2",
         "active": "true",
         "networks": {
             "public": ["1.1.1.0/25"],
@@ -171,9 +170,7 @@ multiple attributes on the same line.
 boolean values as actual bool , yet also as string -->
 ---
 
-## I did mention Pydantic
-
-> What is Pydantic?
+## What is Pydantic?
 
 *It's a Python library for data validation and settings management using Python type annotations. It allows you to define data models with type hints, and it will automatically validate and parse data according to those models.*
 
@@ -324,15 +321,17 @@ Informative scripts were used to understand the fields and optionality
 > *Making things smaller creates more celebration moments :)*
 
 ---
-## One blob of many done done...
+## One blob of many done...
 
 - Multiple to go
 - Having one portion done doesn't guarantee success for the rest
-- This is a repetitive process, one fix at a time (I assume you know how to eat an elephant?)
+- This is a repetitive process, one fix at a time
+(I assume you know how to eat an elephant?)
 - This is the moment where discrepancies are found
   - Start strict
 
----
+<!--
+Start strict allows you to see the errors. If everything is permissive you can't find the "challenges" or errors --- -->
 
 ## Dealing with discrepancies
 
@@ -364,7 +363,7 @@ for d, d_data in json_.items():
 ```
 ---
 
-## First part done
+## First part done ![w:100px](images/green_check.png)
 
 - Accomplished the entire data matching the model
 - Next step
@@ -401,7 +400,7 @@ for d, d_data in json_.items():
 
 ## Gotchas of parsing the data
 
-- I had splitted the giant json into smaller pieces using the types
+- I had split the giant json into smaller pieces using the types
   - Different model types using the type mapper
   - Different data objects within
 - Treat it as a giant black box will give you hell
@@ -421,7 +420,7 @@ for d, d_data in json_.items():
 <!-- When thinking of errors, who are they for? Ensure people can work with them without you! -->
 ---
 
-## Second part done
+## Second part done ![w:100px](images/green_check.png)
 
 - Accomplished the data matching the model
 - Accomplished the model matching the data
@@ -462,6 +461,7 @@ Or things are marked optional instead of mandatory. -->
 ---
 
 ## Model Hygiene
+> The model tells a story about the data. Make sure it's not fiction.
 
 ```python
 @pytest.mark.parametrize(
@@ -479,7 +479,7 @@ def test_main_model_obsolete_fields(json_, model_class, m_type):
         "— probably obsolete! Remove and run the test again to confirm!"
     )
 ```
-> The model tells a story about the data. Make sure it's not fiction.
+
 
 ---
 
@@ -494,7 +494,7 @@ def test_main_model_obsolete_fields(json_, model_class, m_type):
 
 ---
 
-## Third part done
+## Third part done ![w:100px](images/green_check.png)
 
 - Accomplished the data matching the model
 - Accomplished the model matching the data
@@ -580,7 +580,7 @@ Same logic and tests are applied consistently across all environments.
 
 ---
 
-## Fourth part done
+## Fourth part done ![w:100px](images/green_check.png)
 
 - Accomplished the data matching the model
 - Accomplished the model matching the data
@@ -638,7 +638,7 @@ Ensure it is easily consumable for all teams. -->
 **Human:**
 - Changing fields/data is harder than building the pydantic model!
 - People had to get used that their merge requests couldn't be merged.
--
+
 
 ---
 
@@ -677,8 +677,10 @@ Look at your own "freedom data." Ask yourself:
 ## Show results
 
 - Showing the impact needs to be done
-- Spend some time on creating a report (Isn't that one of AI's use cases?)
-
+- Spend some time on creating a report
+(Isn't that one of AI's use cases?)
+<!-- I had a report created allowing to show that a third of the pipelines failed. That is a third of issues not hitting production
+ -->
 ---
 
 ## Q&A
