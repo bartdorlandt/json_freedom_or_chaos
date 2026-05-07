@@ -21,6 +21,13 @@ style: |
         bottom: 80px;
         right: 80px;
     }
+    blockquote::before,
+    blockquote::after {
+        content: '';
+    }
+    blockquote {
+        font-style: italic;
+    }
 ---
 
 # JSON - freedom or chaos
@@ -40,7 +47,7 @@ using pydantic and pytest
 
 ## I had a Dream 💭
 
-> A proper system, a source of records, modelled, validated, easy to use, API friendly...
+> "A proper system, a source of records, modelled, validated, easy to use, API friendly..."
 
 - No more "what does this field actually accept?"
 - One source of records with trustworthy data.
@@ -70,7 +77,7 @@ using pydantic and pytest
 
 ## Where was I, Reality is a ...
 
-> The solution was met with resistance.
+> "The solution was met with resistance."
 
 - Fear of losing flexibility and freedom to change things quickly
 - The jsons are in use, teams and tools depend on them
@@ -133,7 +140,7 @@ data governance is probably doesn't exist
 - Validate the fields and the logic through tests
 - Ensure having it future proof, and maintainable in the long run
 
-> *pydantic and pytest are our buddies*
+> pydantic and pytest are our buddies (in this journey)
 
 <!-- Anything we do should not impact what we have today. -->
 ---
@@ -163,8 +170,8 @@ data governance is probably doesn't exist
 }
 ```
 
-> *"It works, don't touch it."*
->
+> "It works, don't touch it."
+
 <!-- For those familiar with json, immediately recognize the layout is a bit off.
 multiple attributes on the same line.
 boolean values as actual bool , yet also as string -->
@@ -318,7 +325,7 @@ Informative scripts were used to understand the fields and optionality
 - Validate each piece separately
 - Build up the full model incrementally
 
-> *Making things smaller creates more celebration moments :)*
+> Making things smaller creates more celebration moments :)
 
 ---
 ## One blob of many done...
@@ -372,7 +379,6 @@ for d, d_data in json_.items():
   - generating the data from the modelled data
   - diff the original and generated data to find discrepancies
     - Did we capture all the data/fields?
-
 
 ---
 
@@ -441,7 +447,7 @@ for d, d_data in json_.items():
 
 ## Side bonus
 
-> **JSON Schema generation** from Pydantic models
+**JSON Schema generation** from Pydantic models
 
 ```python
 m = EntireModel.model_json_schema()
@@ -463,14 +469,13 @@ Or things are marked optional instead of mandatory. -->
 ---
 
 ## Model Hygiene
-> The model tells a story about the data. Make sure it's not fiction.
+> "The model tells a story about the data. Make sure it's not fiction."
 
 ```python
 @pytest.mark.parametrize(
     "model_class,m_type",
-    [
-        (model_type2.TYPE2, "TYPE2"),
-        (model_type3.TYPE3, "TYPE3"),
+    [ (model_type2.TYPE2, "TYPE2"),
+        (model_type3.TYPE3, "TYPE3")
     ],
 )
 def test_main_model_obsolete_fields(json_, model_class, m_type):
@@ -601,7 +606,7 @@ Same logic and tests are applied consistently across all environments.
 
 ## The 10-Year Data Problem
 
-> Let's clean up this field that hasn't been used since 2014.
+> "Let's clean up this field that hasn't been used since 2014."
 
 Sounds simple. It's not.
 
