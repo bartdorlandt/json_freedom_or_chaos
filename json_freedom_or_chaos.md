@@ -33,20 +33,26 @@ style: |
     blockquote {
         font-style: italic;
     }
+    .main-name {
+        position: absolute;
+        bottom: 16px;
+        right: 100px;
+        font-size: 0.9em;
+    }
 ---
 
 # JSON - freedom or chaos
 
 ## How to trust your data
 
-<div style="text-align: center">
-
 A real-world journey from chaos to confidence
 using pydantic and pytest
 
-</div>
-
 ![height:300px](images/chaos_order.png)
+
+<div class="main-name">
+Bart Dorlandt
+</div>
 
 ---
 
@@ -60,8 +66,9 @@ using pydantic and pytest
 
 *It is going to be beautiful.*
 
-<!-- Given the situation around the json
- -->
+<!--
+Given the situation around the json
+-->
 
 ---
 <div class="logo-position">
@@ -95,7 +102,9 @@ using pydantic and pytest
 - Even having the same output generated wasn't enough...
 
 <!-- Maybe the change was too big, maybe the timing was off or maybe not correctly presented
-Bottom line was that the change was too big and/or undesired -->
+
+Bottom line was that the change was too big and/or undesired
+-->
 
 ---
 
@@ -109,6 +118,7 @@ Bottom line was that the change was too big and/or undesired -->
 ![bg right:30%](images/party.png)
 
 <!-- an old and incomplete validation environment was in place
+
 We all agreed that validation improvement is a good thing -->
 ---
 
@@ -135,7 +145,9 @@ Let's try to stick to the technical story
 
 <!--
 data sets were added via mako templates by line manipulation (existing tools)
+
 Limiting the options of using it programmatically
+
 This crosses multiple teams and tools and therefore a bunch of unknown unknowns
  -->
 ---
@@ -150,8 +162,11 @@ This crosses multiple teams and tools and therefore a bunch of unknown unknowns
     - Not everyone has the same skill set
 
 <!-- * Changes are hard within the team, outside the team almost impossible
+
 * data governance probably doesn't exist
+
 * Not everyone knows git or is comfortable enough to go through rebases
+
 * So, is this worth freedom? Or just the thought of freedom?
 -->
 ---
@@ -195,9 +210,13 @@ This crosses multiple teams and tools and therefore a bunch of unknown unknowns
 
 > "It works, don't touch it."
 
-<!-- For those familiar with json, immediately recognize the layout is a bit off.
+<!--
+For those familiar with json, immediately recognize the layout is a bit off.
+
 multiple attributes on the same line.
-boolean as bool, yet also as string -->
+
+boolean as bool, yet also as string
+-->
 ---
 
 ## What is Pydantic?
@@ -247,6 +266,7 @@ print(u)
 >>> name='Bart Dorlandt' age=25 location='The Netherlands'
 ```
 <!-- Some wishful thinking here -->
+
 ---
 ## A little deeper
 
@@ -265,6 +285,7 @@ class Server(BaseModel):
     bs_flag: bool | None = None
 ```
 <!-- ports have a smart Union, where either of the defined models may match -->
+
 ---
 ## Pydantic useful types
 
@@ -345,7 +366,10 @@ class PortLayout1(BaseModel):
 
         return self
 ```
-<!-- Things can become more complex where complexity is required. Allowing you to be very specific
+<!--
+Things can become more complex where complexity is required.
+Allowing you to be very specific
+
 I do love me some good regex.
 -->
 ---
@@ -363,9 +387,11 @@ Informative scripts were used to understand the fields and optionality
 
 <!--
 * With some scripts I was able to get a feeling of the different fields and if they could be mandatory
+
 * Take one dict and parse it, piece by piece.
+
 * Gain knowledge, gain trust
- -->
+-->
 
 ---
 ## One blob of many done...
@@ -380,7 +406,9 @@ Informative scripts were used to understand the fields and optionality
 
 <!--
 * Many more blobs to go, all slightly different
+
 * Start strict allows you to see the errors. If everything is permissive you can't find the "challenges" or errors
+
 * Remember the description field, it can also be used to make notes for later
   * Or your jira tickets
 -->
@@ -398,6 +426,7 @@ Informative scripts were used to understand the fields and optionality
 
 <!--
 - Not everything can be fixed on day 1
+
 - Save something for tomorrow
 -->
 
@@ -421,7 +450,9 @@ for d, d_data in json_.items():
 ```
 <!--
 Let's explore some code. Kept simple for clarity
+
 No error is good, as usual
+
 Dealing with the data on a per `d_type` basis, to keep the error scope small
 
 -->
@@ -437,6 +468,7 @@ Dealing with the data on a per `d_type` basis, to keep the error scope small
 
 <!--
 Fast forward, we got the entire model done
+
 Next, the other direction
 -->
 ---
@@ -461,7 +493,9 @@ for d, d_data in json_.items():
 
 <!--
 * This is simplified code for clarity.
+
 * Dealing with the data on a per `d_type` basis, to keep the error scope small
+
 * Again, looping over portions to validate and get more precise errors
 -->
 
@@ -499,7 +533,9 @@ Make the errors consumable and specific
 
 <!--
 - Use the description field to add notes for the json schema
+
 - Are there fields that are optional but always populated?
+
 - Are there fields that are optional but never populated?
 -->
 ---
@@ -523,8 +559,11 @@ And load it in VScode (settings.json)
 ![drop-shadow](images/model_validation.png)
 
 <!-- This step is specifically useful to keep the model accurate and up-to-date over time.
+
 Else, I'm quite positive fields
+
 * would not be removed if it was the last entry.
+
 * Or things are marked optional instead of mandatory.
 -->
 ---
@@ -588,7 +627,9 @@ Now let's go beyond the single field validation
 
 <!--
 Pydantic is great for fields.
+
 It can't do uniqueness verification or isn't the tool for conditional dependencies.
+
 Especially on multiple levels
 -->
 ---
@@ -626,8 +667,11 @@ def test_ips_g20(flavor20sets: dict[str, dict]) -> None:
 ```
 <!--
 In the solution I use quite a lot of fixtures
+
 * to ensure consistency across different test cases
+
 * to provide reusable subsets of data
+
 * to keep tests simple
 -->
 ---
@@ -650,6 +694,7 @@ def json_fixture(request: pytest.FixtureRequest) -> dict[str, dict]:
     return instances_mapper.load_instances_pop_types(request.param)
 ```
 <!-- When dealing with multiple environments, this approach works great.
+
 Same logic and tests are applied consistently across all environments.
 -->
 ---
@@ -709,7 +754,9 @@ Not everyone works the same way:
 
 <!--
 Both are modifying the same JSON files,
+
 but they have very different workflows and comfort levels with change.
+
 Ensure it is easily consumable for all teams.
 -->
 
