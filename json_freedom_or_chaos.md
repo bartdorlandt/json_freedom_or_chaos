@@ -60,7 +60,7 @@ Bart Dorlandt
 
 > "A proper system, a source of records, modelled, validated, easy to use, API friendly..."
 
-- No more "what does this field actually accept?"
+- No more "what value should this field be?"
 - One source of records with trustworthy data.
 - Data generated instead of manually crafted or copied.
 
@@ -90,7 +90,16 @@ Given the situation around the json
 
 </div>
 
-<!-- I'll be talking you on a journey of chaos and struggle towards a better future, a trusted future -->
+
+<!--
+Hi, I'm Bart.
+I've been in networking all my career and dove into automation about 10 years ago
+Last year was my first PyGrunn and I loved it, so had to come back
+
+What you need to know about me: I live by the phrase "There must be a better way"
+
+I'll be talking you on a journey of chaos and struggle towards a better future, a trusted future
+-->
 ---
 
 ## Where was I, Reality is a ...
@@ -108,11 +117,11 @@ Bottom line was that the change was too big and/or undesired
 
 ---
 
-## The agreement
+## What next?
 
 - Some validation in place
-- Very limited data field validation
-- Mostly written on issue, "after the fact", when something was broken
+  - Very limited data field validation
+  - Mostly written on issue, "after the fact", when something was broken
 - **No argument against improving validation!!**
 
 ![bg right:30%](images/party.png)
@@ -128,20 +137,23 @@ We all agreed that validation improvement is a good thing -->
 
 ![bg left:50%](images/say_no_more.png)
 
-<!-- Let's take the win for better validation and ensure less production issues. Let's validate the hell out of it! -->
+<!--
+Take the win
+
+Let's validate the hell out of it!
+
+No more production issues!-->
 
 ---
 
 ## The situation
 
 - Massive JSON files describing a multitude of sets of data
-- Manually crafted (via Mako templates)
+- Manually crafted (via Mako templates, or by hand)
   - Some dicts crafted on a single lines, others vertically aligned
 - **12,000 lines** in "short" format — **72,000 lines** in long format
 - Can't be modified and dumped programmatically
 - Tools depend on it, some unknown unknowns might break on dumped JSON
-
-Let's try to stick to the technical story
 
 <!--
 data sets were added via mako templates by line manipulation (existing tools)
@@ -157,7 +169,8 @@ This crosses multiple teams and tools and therefore a bunch of unknown unknowns
 - Freedom data grows organically — it was convenient at the time
 - No schema = no contract
 - No contract = no trust
-- Fields accumulate. Nobody removes them. *Someone might be using it.*
+- Fields accumulate. Nobody removes them.
+  - *Someone might be using it.*
   - Multi team challenges
     - Not everyone has the same skill set
 
@@ -175,7 +188,7 @@ This crosses multiple teams and tools and therefore a bunch of unknown unknowns
 
 - Work within the constraints of the current situation
 - Validate the changes through pipelines
-- Validate the fields and the logic through tests
+- Validate the fields and the logic
 - Ensure having it future proof, and maintainable in the long run
 
 > pydantic and pytest are our buddies (not only in this journey)
@@ -203,7 +216,8 @@ This crosses multiple teams and tools and therefore a bunch of unknown unknowns
         },
         "some_field_nobody_remembers": "value from 2014",
         "legacy_thing": true,
-        "old_generation": "true"
+        "old_generation": "true",
+        "connection_size": "100"
     }
 ]
 ```
@@ -284,7 +298,7 @@ class Server(BaseModel):
     type_id: PositiveInt = Field(alias="type-id")
     bs_flag: bool | None = None
 ```
-<!-- ports have a smart Union, where either of the defined models may match -->
+<!-- ports have a smart Union, where either of the defined models should match -->
 
 ---
 ## Pydantic useful types
@@ -332,8 +346,10 @@ class Connection(BaseModel):
 </div>
 </div>
 
-<!-- The descriptions can be useful for later, but also allow for additional information when generating a json schema.
- -->
+<!-- The descriptions can be useful for later,
+
+but also allow for additional information when generating a json schema.
+-->
 
 ---
 ## Down the rabbit hole
@@ -368,6 +384,7 @@ class PortLayout1(BaseModel):
 ```
 <!--
 Things can become more complex where complexity is required.
+
 Allowing you to be very specific
 
 I do love me some good regex.
@@ -391,6 +408,8 @@ Informative scripts were used to understand the fields and optionality
 * Take one dict and parse it, piece by piece.
 
 * Gain knowledge, gain trust
+
+* Celebration moments matter in the corporate world
 -->
 
 ---
@@ -427,7 +446,7 @@ Informative scripts were used to understand the fields and optionality
 <!--
 - Not everything can be fixed on day 1
 
-- Save something for tomorrow
+- There is always tomorrow
 -->
 
 ---
@@ -454,7 +473,6 @@ Let's explore some code. Kept simple for clarity
 No error is good, as usual
 
 Dealing with the data on a per `d_type` basis, to keep the error scope small
-
 -->
 ---
 
@@ -532,6 +550,8 @@ Make the errors consumable and specific
   - Forced model hygiene
 
 <!--
+- Making everybody care as much might be over achieving
+
 - Use the description field to add notes for the json schema
 
 - Are there fields that are optional but always populated?
