@@ -1,4 +1,6 @@
 /data/
 /images/tests/
-/export/*
+/export/*_notes.pdf
+/export/*.txt
+/export/*.pptx
 plan.md
