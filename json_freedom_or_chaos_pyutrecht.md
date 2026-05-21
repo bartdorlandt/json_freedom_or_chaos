@@ -67,7 +67,7 @@ Bart Dorlandt
 *It is going to be beautiful.*
 
 <!--
-Given the situation around the json
+Provide the situation around the json
 -->
 
 ---
@@ -81,7 +81,6 @@ Given the situation around the json
 
 - Freelance Network Automation Solution Architect
 - 20 years in network engineering and automation
-- Last year I presented "Repos are like children - Parenting 101"
 - Lives by the phrase: *There must be a better way*
 
 <div class="bottom-right">
@@ -94,7 +93,6 @@ Given the situation around the json
 <!--
 Hi, I'm Bart.
 I've been in networking all my career and dove into automation about 10 years ago
-Last year was my first PyGrunn and I loved it, so had to come back
 
 What you need to know about me: I live by the phrase "There must be a better way"
 
@@ -580,7 +578,7 @@ And load it in VScode (settings.json)
 
 <!-- This step is specifically useful to keep the model accurate and up-to-date over time.
 
-Else, I'm quite positive fields
+Else, I'm quite positive that, fields
 
 * would not be removed if it was the last entry.
 
