@@ -10,42 +10,83 @@ vars:
     "--title 'JSON: Freedom or Chaos?' --author 'Bart Dorlandt' --keywords
     'json, validation, chaos, freedom' --description 'A presentation about the
     challenges of working with JSON data and the importance of validation.'"
+  OUTPUT_DIR: "presentation"
+  PORT: "18081"
 
 tasks:
   default: task -l --sort none
 
-  mkdir:export:
-    desc: Create export directory if it doesn't exist
+  mkdir:presentation:
+    desc: Create presentation directory if it doesn't exist
     internal: true
     status:
-      - test -d export
+      - test -d {{.OUTPUT_DIR}}
     cmds:
-      - mkdir -p export
+      - mkdir -p {{.OUTPUT_DIR}}
+
+  select:file:
+    desc: Interactively pick a markdown file to export
+    internal: true
+    silent: true
+    cmds:
+      - |
+        set -e
+        if [ -n "{{.FILE}}" ]; then
+          if [ ! -f "{{.FILE}}" ]; then
+            echo "No such file: {{.FILE}}" >&2
+            exit 1
+          fi
+          printf '%s\n' "{{.FILE}}" > .task-selected-file
+          exit 0
+        fi
+        files=$(gfind . -maxdepth 1 -type f -name "*.md" ! -name "README.md" -printf "%P\n" | sort)
+        if [ -z "$files" ]; then
+          echo "No markdown files found (excluding README.md)" >&2
+          exit 1
+        fi
+        if command -v fzf >/dev/null 2>&1; then
+          selected=$(printf '%s\n' "$files" | fzf --height=40% --reverse --prompt="Export which file? ")
+        else
+          printf '%s\n' "$files" | nl -w2 -s') ' >&2
+          printf 'Export which file? [number] ' >&2
+          read -r n </dev/tty
+          selected=$(printf '%s\n' "$files" | sed -n "${n}p")
+        fi
+        if [ -z "$selected" ]; then
+          echo "Nothing selected" >&2
+          exit 1
+        fi
+        printf '%s\n' "$selected" > .task-selected-file
 
   export:pdf:
-    desc: Export the presentation to PDF
-    deps: [mkdir:export]
+    desc: Export a selected presentation to PDF (use FILE=x.md to skip the prompt)
+    deps: [mkdir:presentation]
     vars:
       OPTIONS: "{{.MAIN_OPTIONS}} --pdf {{.METADATA}}"
     cmds:
-      - for:
-          var: FILES
-        cmd: marp {{.OPTIONS}} -o export/{{.ITEM | replace ".md" ".pdf"}} {{.ITEM}}
+      - task: select:file
+        vars: { FILE: "{{.FILE}}" }
+      - |
+        f=$(cat .task-selected-file); rm -f .task-selected-file
+        marp {{.OPTIONS}} -o "{{.OUTPUT_DIR}}/${f%.md}.pdf" "$f"
 
   export:pptx:
-    desc: Export the presentation to PPTX
-    deps: [mkdir:export]
+    desc: Export a selected presentation to PPTX (use FILE=x.md to skip the prompt)
+    deps: [mkdir:presentation]
     vars:
       OPTIONS: "{{.MAIN_OPTIONS}} --pptx {{.METADATA}}"
     cmds:
-      - for:
-          var: FILES
-        cmd: marp {{.OPTIONS}} -o export/{{.ITEM | replace ".md" ".pptx"}} {{.ITEM}}
+      - task: select:file
+        vars: { FILE: "{{.FILE}}" }
+      - |
+        f=$(cat .task-selected-file); rm -f .task-selected-file
+        marp {{.OPTIONS}} -o "{{.OUTPUT_DIR}}/${f%.md}.pptx" "$f"
 
   present:
     desc: Present the presentation
+    aliases: [serve]
     vars:
       OPTIONS: "{{.MAIN_OPTIONS}}"
     cmds:
-      - open http://localhost:8080/
-      - marp -s {{.OPTIONS}} .
+      - open http://localhost:{{.PORT}}/
+      - PORT={{.PORT}} marp {{.OPTIONS}} -s .
