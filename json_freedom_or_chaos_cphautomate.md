@@ -48,7 +48,8 @@ style: |
 A real-world journey from chaos to confidence
 using pydantic and pytest
 
-![height:300px](images/chaos_order.png)
+*CPH^Automate*
+![height:280px](images/chaos_order.png)
 
 <div class="main-name">
 Bart Dorlandt
@@ -85,10 +86,10 @@ never manually copied data
 ## Bart Dorlandt
 
 - I help organizations and engineers improve their network automation strategies
-- Lives by the phrase: *There must be a better way*
-- Founder of NLNAM
+- Lives by the phrase: ***There must be a better way***
+- Founder of **NLNAM**
 - Co-organizer of PyUtrecht
-- Advisory board member of NAF
+- Advisory board member at **NAF**
 
 <div class="bottom-right">
 
@@ -115,6 +116,7 @@ I'll be talking you on a journey of chaos and struggle towards a better future, 
 - Even having the same output generated wasn't enough...
 
 <!--
+
 Maybe the change was too big, maybe the timing was off or maybe not correctly presented
 
 The solution has a database and not git, that must be it.
@@ -208,7 +210,10 @@ Rumours have been heard about the files being parsed with sed and awk
 <!--
 Anything we do should not impact what we have today.
 
-Working with constraints -->
+Working with constraints
+
+I'll take you through 4 steps to achieve a trusted future
+-->
 
 ---
 
